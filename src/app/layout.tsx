@@ -1,7 +1,10 @@
+import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 import { Inter as FontSans } from "next/font/google";
 import "./globals.css";
-import { cn } from "@/lib/utils";
+import { ThemeProvider } from "next-themes";
+import { ThemeToggler } from "@/components/theme-toggler";
+import { NavMenu } from "@/components/nav-menu";
 
 const inter = FontSans({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -22,7 +25,18 @@ export default function RootLayout({
           "min-h-screen bg-background font-sans antialiased",
         )}
       >
-        {children}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <header className="container h-14 flex items-center justify-between">
+            <NavMenu />
+            <ThemeToggler />
+          </header>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
