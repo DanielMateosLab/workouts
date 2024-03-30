@@ -2,18 +2,6 @@
 
 import * as aws from "@pulumi/aws";
 
-const userPool = new aws.cognito.UserPool("WorkoutsUserPool", {
-  accountRecoverySetting: {
-    recoveryMechanisms: [{ name: "verified_email", priority: 1 }],
-  },
-  autoVerifiedAttributes: ["email"],
-  usernameAttributes: ["email"],
-});
-const userPoolClient = new aws.cognito.UserPoolClient(
-  "WorkoutsUserPoolClient",
-  { userPoolId: userPool.id },
-);
-
 export default $config({
   app(input) {
     return {
@@ -23,6 +11,19 @@ export default $config({
     };
   },
   async run() {
+    const userPool = new aws.cognito.UserPool("WorkoutsUserPool", {
+      accountRecoverySetting: {
+        recoveryMechanisms: [{ name: "verified_email", priority: 1 }],
+      },
+      autoVerifiedAttributes: ["email"],
+      usernameAttributes: ["email"],
+    });
+
+    const userPoolClient = new aws.cognito.UserPoolClient(
+      "WorkoutsUserPoolClient",
+      { userPoolId: userPool.id },
+    );
+
     new sst.aws.Nextjs("MyWeb", {
       domain: {
         domainName: "workouts.danielmatlab.com",
