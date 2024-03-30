@@ -10,6 +10,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@aws-sdk/client-cognito-identity-provider": "^3.540.0",
     "@hookform/resolvers": "^3.3.4",
     "@pulumi/aws": "^6.28.1",
     "@pulumi/pulumi": "^3.112.0",
