@@ -24,11 +24,16 @@ export default $config({
       { userPoolId: userPool.id },
     );
 
+    const domain = "danielmatlab.com";
+    const subdomainPostfix =
+      $app.stage === "production" ? "" : `-${$app.stage}`;
+    const subdomain = `${$app.name}${subdomainPostfix}`;
+
     new sst.aws.Nextjs("MyWeb", {
       domain: {
-        domainName: "workouts.danielmatlab.com",
-        redirects: ["www.workouts.danielmatlab.com"],
-        hostedZone: "danielmatlab.com",
+        domainName: `${subdomain}.${domain}`,
+        redirects: [`www.${subdomain}.${domain}`],
+        hostedZone: domain,
       },
       environment: {
         NEXT_PUBLIC_USER_POOL_ID: userPool.id,
