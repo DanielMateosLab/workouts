@@ -5,6 +5,7 @@ import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import { ThemeToggler } from "@/components/theme-toggler";
 import { NavMenu } from "@/components/nav-menu";
+import { Toaster } from "@/components/ui/sonner";
 
 const inter = FontSans({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -36,6 +37,7 @@ export default function RootLayout({
             <ThemeToggler />
           </header>
           {children}
+          <Toaster richColors />
         </ThemeProvider>
       </body>
     </html>
