@@ -42,11 +42,13 @@ export function ConfirmForm({ sub }: ConfirmFormProps) {
     startConfirmationTransition(async () => {
       const res = await confirmSignup(values);
       if (res.status === "invalidData")
-        res.issues.forEach((i) =>
+        return res.issues.forEach((i) =>
           form.setError(i.path as keyof ConfirmModel, { message: i.message }),
         );
       if (res.status === "error")
-        form.setError("root", { message: "An unexpected error occurred" });
+        return form.setError("root", {
+          message: "An unexpected error occurred",
+        });
       toast.success("Account confirmed!", {
         description: "You can now log in.",
       });
