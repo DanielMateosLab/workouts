@@ -1,12 +1,15 @@
 "use client";
 
 import { confirmSignup } from "@/actions/confirm";
+import { resendCode } from "@/actions/resend-code";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ConfirmModel, confirmModel } from "@/models/confirm";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import {
   Form,
   FormControl,
@@ -31,10 +34,11 @@ export function ConfirmForm({ sub }: ConfirmFormProps) {
       code: "",
     },
   });
-  const [isPending, startTransition] = useTransition();
+  const [confirmationIsPending, startConfirmationTransition] = useTransition();
+  const [resendIsPending, startResendTransition] = useTransition();
 
-  async function onSubmit(values: ConfirmModel) {
-    startTransition(async () => {
+  const onSubmit = (values: ConfirmModel) =>
+    startConfirmationTransition(async () => {
       const res = await confirmSignup(values);
       if (res.status === "invalidData")
         res.issues.forEach((i) =>
@@ -43,7 +47,18 @@ export function ConfirmForm({ sub }: ConfirmFormProps) {
       if (res.status === "error")
         form.setError("root", { message: "An unexpected error occurred" });
     });
-  }
+
+  const handleResendCode = () =>
+    startResendTransition(async () => {
+      const res = await resendCode({ sub });
+      if (res.status !== "success")
+        return form.setError("root", {
+          message: "An unexpected error occurred",
+        });
+      toast.success("Done!", {
+        description: "We sent you a new code. Please check your email.",
+      });
+    });
 
   return (
     <Card className="mx-auto max-w-sm">
@@ -79,8 +94,16 @@ export function ConfirmForm({ sub }: ConfirmFormProps) {
               )}
             />
 
-            <Button type="submit" loading={isPending}>
+            <Button type="submit" loading={confirmationIsPending}>
               Submit
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={handleResendCode}
+              loading={resendIsPending}
+            >
+              Resend code
             </Button>
             <FormFieldContext.Provider value={{ name: "root" }}>
               <FormMessage />
