@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ConfirmModel, confirmModel } from "@/models/confirm";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useTransition } from "react";
+import { useRef, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import {
@@ -35,6 +35,7 @@ export function ConfirmForm({ sub }: ConfirmFormProps) {
       code: "",
     },
   });
+  const formRef = useRef<HTMLFormElement>(null);
   const [confirmationIsPending, startConfirmationTransition] = useTransition();
   const [resendIsPending, startResendTransition] = useTransition();
 
@@ -74,7 +75,11 @@ export function ConfirmForm({ sub }: ConfirmFormProps) {
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+          <form
+            ref={formRef}
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="grid gap-4"
+          >
             <FormField
               control={form.control}
               name="code"
@@ -82,7 +87,11 @@ export function ConfirmForm({ sub }: ConfirmFormProps) {
                 <FormItem>
                   <FormLabel>Verification Code</FormLabel>
                   <FormControl>
-                    <InputOTP maxLength={6} {...field}>
+                    <InputOTP
+                      maxLength={6}
+                      {...field}
+                      onComplete={() => formRef.current?.requestSubmit()}
+                    >
                       <InputOTPGroup>
                         <InputOTPSlot index={0} />
                         <InputOTPSlot index={1} />
