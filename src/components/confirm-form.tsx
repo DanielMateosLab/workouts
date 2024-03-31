@@ -27,6 +27,7 @@ interface ConfirmFormProps {
 }
 
 export function ConfirmForm({ sub }: ConfirmFormProps) {
+  const router = useRouter();
   const form = useForm<ConfirmModel>({
     resolver: zodResolver(confirmModel),
     defaultValues: {
@@ -46,6 +47,10 @@ export function ConfirmForm({ sub }: ConfirmFormProps) {
         );
       if (res.status === "error")
         form.setError("root", { message: "An unexpected error occurred" });
+      toast.success("Account confirmed!", {
+        description: "You can now log in.",
+      });
+      router.push("/login");
     });
 
   const handleResendCode = () =>
