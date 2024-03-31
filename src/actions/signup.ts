@@ -1,12 +1,13 @@
 "use server";
 
+import "server-only";
 import { signUpModel } from "@/models/signup";
 import {
   CognitoIdentityProviderClient,
   SignUpCommand,
   UsernameExistsException,
 } from "@aws-sdk/client-cognito-identity-provider";
-import "server-only";
+import { redirect } from "next/navigation";
 
 type SignUpResponse =
   | {
@@ -14,13 +15,11 @@ type SignUpResponse =
       issues: { path: string; message: string }[];
     }
   | {
-      status: "success";
-    }
-  | {
       status: "error";
     };
 
 export const signUp = async (data: unknown): Promise<SignUpResponse> => {
+  let sub: string;
   try {
     const result = signUpModel.safeParse(data);
     if (!result.success)
@@ -45,9 +44,10 @@ export const signUp = async (data: unknown): Promise<SignUpResponse> => {
     });
 
     const res = await client.send(command);
-    console.log(JSON.stringify(res, null, 2));
-    return { status: "success" };
+    if (!res.UserSub) throw new Error("No sub in response");
+    sub = res.UserSub;
   } catch (error) {
+    console.log(error);
     if (error instanceof UsernameExistsException)
       return {
         status: "invalidData",
@@ -60,4 +60,5 @@ export const signUp = async (data: unknown): Promise<SignUpResponse> => {
       };
     return { status: "error" };
   }
+  redirect(`/confirm/${sub}`);
 };
