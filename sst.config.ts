@@ -36,6 +36,7 @@ export default $config({
         hostedZone: domain,
       },
       environment: {
+        NEXT_PUBLIC_DOMAIN: domain,
         USER_POOL_ID: userPool.id,
         USER_POOL_CLIENT_ID: userPoolClient.id,
         NEXT_PUBLIC_REGION: aws.config.requireRegion(),
