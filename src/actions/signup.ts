@@ -8,17 +8,9 @@ import {
   UsernameExistsException,
 } from "@aws-sdk/client-cognito-identity-provider";
 import { redirect } from "next/navigation";
+import { ErrorResponse } from "@/types/error-response";
 
-type SignUpResponse =
-  | {
-      status: "invalidData";
-      issues: { path: string; message: string }[];
-    }
-  | {
-      status: "error";
-    };
-
-export const signUp = async (data: unknown): Promise<SignUpResponse> => {
+export const signUp = async (data: unknown): Promise<ErrorResponse> => {
   let sub: string;
   try {
     const result = signUpModel.safeParse(data);

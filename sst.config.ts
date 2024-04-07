@@ -11,19 +11,6 @@ export default $config({
     };
   },
   async run() {
-    const userPool = new aws.cognito.UserPool("WorkoutsUserPool", {
-      accountRecoverySetting: {
-        recoveryMechanisms: [{ name: "verified_email", priority: 1 }],
-      },
-      autoVerifiedAttributes: ["email"],
-      usernameAttributes: ["email"],
-    });
-
-    const userPoolClient = new aws.cognito.UserPoolClient(
-      "WorkoutsUserPoolClient",
-      { userPoolId: userPool.id },
-    );
-
     const domain = "danielmatlab.com";
     const subdomainPostfix =
       $app.stage === "production" ? "" : `-${$app.stage}`;
@@ -51,6 +38,57 @@ export default $config({
       },
     );
 
+    const authTable = new aws.dynamodb.Table("AuthTable", {
+      attributes: [
+        { name: "pk", type: "S" },
+        { name: "sk", type: "S" },
+        { name: "GSI1PK", type: "S" },
+        { name: "GSI1SK", type: "S" },
+        // { name: "expires", type: "N" },
+      ],
+      billingMode: "PAY_PER_REQUEST",
+      globalSecondaryIndexes: [
+        {
+          hashKey: "GSI1PK",
+          name: "GSI1",
+          projectionType: "ALL",
+          rangeKey: "GSI1SK",
+        },
+      ],
+      hashKey: "pk",
+      rangeKey: "sk",
+      // ttl: { attributeName: "expires", enabled: true },
+    });
+
+    const authTableActions = [
+      "dynamodb:BatchGetItem",
+      "dynamodb:BatchWriteItem",
+      "dynamodb:Describe*",
+      "dynamodb:List*",
+      "dynamodb:PutItem",
+      "dynamodb:DeleteItem",
+      "dynamodb:GetItem",
+      "dynamodb:Scan",
+      "dynamodb:Query",
+      "dynamodb:UpdateItem",
+    ];
+    const authTablePolicy = new aws.iam.Policy("AuthTablePolicy", {
+      description: "Policy for the AuthTable",
+      policy: JSON.stringify({
+        Version: "2012-10-17",
+        Statement: [
+          {
+            Sid: "DynamoDBAccess",
+            Effect: "Allow",
+            Action: authTableActions,
+            Resource: ["*"],
+          },
+        ],
+      }),
+    });
+
+    const authSecret = new sst.Secret("AuthSecret");
+
     new sst.aws.Nextjs("MyWeb", {
       domain: {
         domainName: `${subdomain}.${domain}`,
@@ -58,17 +96,19 @@ export default $config({
         hostedZone: domain,
       },
       environment: {
+        NEXT_PUBLIC_APP_NAME: $app.name,
         NEXT_PUBLIC_DOMAIN: domain,
-        USER_POOL_ID: userPool.id,
-        USER_POOL_CLIENT_ID: userPoolClient.id,
         NEXT_PUBLIC_REGION: aws.config.requireRegion(),
+        AUTH_SECRET: authSecret.value,
       },
       permissions: [
+        // TODO: test this policy is restricting access, test table policy
         {
           actions: ["ses:SendEmail", "ses:SendRawEmail"],
           resources: [sesLoginCodeSendingPolicy.arn],
         },
       ],
+      link: [authTable],
     });
   },
 });

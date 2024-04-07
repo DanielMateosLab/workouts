@@ -4,7 +4,7 @@ import { signUp } from "@/actions/signup";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { SignUpModel, signUpModel } from "@/models/signup";
+import { LoginModel, loginModel } from "@/models/login";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useTransition } from "react";
@@ -19,28 +19,27 @@ import {
   FormLabel,
   FormMessage,
 } from "./ui/form";
+import { signIn } from "next-auth/react";
 
 export function SignUpForm() {
-  const form = useForm<SignUpModel>({
-    resolver: zodResolver(signUpModel),
-    defaultValues: {
-      email: "",
-      password: "",
-      repeatPassword: "",
-    },
+  const form = useForm<LoginModel>({
+    resolver: zodResolver(loginModel),
+    defaultValues: { email: "" },
   });
   const [isPending, startTransition] = useTransition();
 
-  async function onSubmit(values: SignUpModel) {
-    startTransition(async () => {
-      const res = await signUp(values);
-      if (res.status === "invalidData")
-        res.issues.forEach((i) =>
-          form.setError(i.path as keyof SignUpModel, { message: i.message }),
-        );
-      if (res.status === "error")
-        form.setError("root", { message: "An unexpected error occurred" });
-    });
+  async function onSubmit(values: LoginModel) {
+    const res = await signIn("email", { email: values.email });
+    console.log(res);
+    // startTransition(async () => {
+    //   const res = await signUp(values);
+    //   if (res.status === "invalidData")
+    //     res.issues.forEach((i) =>
+    //       form.setError(i.path as keyof LoginModel, { message: i.message }),
+    //     );
+    //   if (res.status === "error")
+    //     form.setError("root", { message: "An unexpected error occurred" });
+    // });
   }
 
   return (
@@ -63,37 +62,6 @@ export function SignUpForm() {
                   <FormDescription>
                     You will need to verify your email address.
                   </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input type="password" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    Must be at least 8 characters long and contain at least 1
-                    number, 1 special character, 1 uppercase letter, and 1
-                    lowercase letter.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="repeatPassword"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Repeat Password</FormLabel>
-                  <FormControl>
-                    <Input type="password" {...field} />
-                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
