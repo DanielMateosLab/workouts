@@ -29,6 +29,28 @@ export default $config({
       $app.stage === "production" ? "" : `-${$app.stage}`;
     const subdomain = `${$app.name}${subdomainPostfix}`;
 
+    const sesLoginCodeSendingPolicy = new aws.iam.Policy(
+      "WorkoutsSesLoginCodeSendingPolicy",
+      {
+        description: "Restrictive policy for sending login codes via SES",
+        policy: JSON.stringify({
+          Version: "2012-10-17",
+          Statement: [
+            {
+              Effect: "Allow",
+              Action: ["ses:SendEmail", "ses:SendRawEmail"],
+              Resource: "*",
+              Condition: {
+                StringEquals: {
+                  "ses:FromAddress": `no-reply@${domain}`,
+                },
+              },
+            },
+          ],
+        }),
+      },
+    );
+
     new sst.aws.Nextjs("MyWeb", {
       domain: {
         domainName: `${subdomain}.${domain}`,
@@ -41,6 +63,12 @@ export default $config({
         USER_POOL_CLIENT_ID: userPoolClient.id,
         NEXT_PUBLIC_REGION: aws.config.requireRegion(),
       },
+      permissions: [
+        {
+          actions: ["ses:SendEmail", "ses:SendRawEmail"],
+          resources: [sesLoginCodeSendingPolicy.arn],
+        },
+      ],
     });
   },
 });
