@@ -4,13 +4,26 @@ import { DynamoDB } from "@aws-sdk/client-dynamodb";
 import { SendEmailCommand } from "@aws-sdk/client-ses";
 import { DynamoDBDocument } from "@aws-sdk/lib-dynamodb";
 import NextAuth from "next-auth";
-import Env from "./src/lib/env";
+import Env from "./lib/env";
+import { Resource } from "sst";
 
 const domain = Env.get("domain");
 const appName = Env.get("appName");
 const region = Env.get("region");
 
 const from = `no-reply@${domain}`;
+
+const db = new DynamoDB({ region });
+const client = DynamoDBDocument.from(db, {
+  marshallOptions: {
+    convertEmptyValues: true,
+    removeUndefinedValues: true,
+    convertClassInstanceToMap: true,
+  },
+});
+const adapter = DynamoDBAdapter(client, {
+  tableName: Resource.AuthTable.tableName,
+});
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
@@ -32,11 +45,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               },
               Message: {
                 Body: {
-                  // Html: {
-                  //   Charset: "UTF-8",
-                  //   Data: `Here is your <a href="${url}">login link</a>.`,
-                  // },
-                  Text: {
+                  Html: {
                     Charset: "UTF-8",
                     Data: `Here is your <a href="${url}">login link</a>.`,
                   },
@@ -57,17 +66,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     },
   ],
-  adapter: DynamoDBAdapter(
-    DynamoDBDocument.from(new DynamoDB({ region }), {
-      marshallOptions: {
-        convertEmptyValues: true,
-        removeUndefinedValues: true,
-        convertClassInstanceToMap: true,
-      },
-    }),
-    { tableName: process.env.TABLE_NAME },
-  ),
-  pages: {
-    signIn: "/login",
-  },
+  adapter,
+  // pages: {
+  //   signIn: "/login",
+  // },
+  debug: true,
 });

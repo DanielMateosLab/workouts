@@ -1,8 +1,10 @@
 "use client";
 
+import { login } from "@/actions/login";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { LoginModel, loginModel } from "@/models/login";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
@@ -14,7 +16,6 @@ import {
   FormLabel,
   FormMessage,
 } from "./ui/form";
-import { LoginModel, loginModel } from "@/models/login";
 
 export function LoginForm() {
   const form = useForm<LoginModel>({
@@ -24,8 +25,8 @@ export function LoginForm() {
     },
   });
 
-  function onSubmit(values: LoginModel) {
-    console.log(values);
+  async function onSubmit(values: LoginModel) {
+    await login(values);
   }
 
   return (

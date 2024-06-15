@@ -16,28 +16,6 @@ export default $config({
       $app.stage === "production" ? "" : `-${$app.stage}`;
     const subdomain = `${$app.name}${subdomainPostfix}`;
 
-    const sesLoginCodeSendingPolicy = new aws.iam.Policy(
-      "WorkoutsSesLoginCodeSendingPolicy",
-      {
-        description: "Restrictive policy for sending login codes via SES",
-        policy: JSON.stringify({
-          Version: "2012-10-17",
-          Statement: [
-            {
-              Effect: "Allow",
-              Action: ["ses:SendEmail", "ses:SendRawEmail"],
-              Resource: "*",
-              Condition: {
-                StringEquals: {
-                  "ses:FromAddress": `no-reply@${domain}`,
-                },
-              },
-            },
-          ],
-        }),
-      },
-    );
-
     const authTable = new aws.dynamodb.Table("AuthTable", {
       attributes: [
         { name: "pk", type: "S" },
@@ -60,33 +38,6 @@ export default $config({
       // ttl: { attributeName: "expires", enabled: true },
     });
 
-    const authTableActions = [
-      "dynamodb:BatchGetItem",
-      "dynamodb:BatchWriteItem",
-      "dynamodb:Describe*",
-      "dynamodb:List*",
-      "dynamodb:PutItem",
-      "dynamodb:DeleteItem",
-      "dynamodb:GetItem",
-      "dynamodb:Scan",
-      "dynamodb:Query",
-      "dynamodb:UpdateItem",
-    ];
-    const authTablePolicy = new aws.iam.Policy("AuthTablePolicy", {
-      description: "Policy for the AuthTable",
-      policy: JSON.stringify({
-        Version: "2012-10-17",
-        Statement: [
-          {
-            Sid: "DynamoDBAccess",
-            Effect: "Allow",
-            Action: authTableActions,
-            Resource: ["*"],
-          },
-        ],
-      }),
-    });
-
     const authSecret = new sst.Secret("AuthSecret");
 
     new sst.aws.Nextjs("MyWeb", {
@@ -101,13 +52,7 @@ export default $config({
         NEXT_PUBLIC_REGION: aws.config.requireRegion(),
         AUTH_SECRET: authSecret.value,
       },
-      permissions: [
-        // TODO: test this policy is restricting access, test table policy
-        {
-          actions: ["ses:SendEmail", "ses:SendRawEmail"],
-          resources: [sesLoginCodeSendingPolicy.arn],
-        },
-      ],
+      permissions: [],
       link: [authTable],
     });
   },
