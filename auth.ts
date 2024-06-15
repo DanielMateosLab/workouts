@@ -12,10 +12,7 @@ const region = Env.get("region");
 
 const from = `no-reply@${domain}`;
 
-export const {
-  handlers: { GET, POST },
-  auth,
-} = NextAuth({
+export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
     {
       name: "Email",
