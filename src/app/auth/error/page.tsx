@@ -1,13 +1,18 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/shadcn/button";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from "@/components/shadcn/card";
 import {
   FormField,
   FormItem,
   FormLabel,
   FormControl,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+} from "@/components/shadcn/form";
+import { Input } from "@/components/shadcn/input";
 import { NextSearchParams } from "@/types/utils";
 import Link from "next/link";
 import { Form } from "react-hook-form";

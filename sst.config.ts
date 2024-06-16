@@ -49,7 +49,7 @@ export default $config({
       environment: {
         NEXT_PUBLIC_APP_NAME: $app.name,
         NEXT_PUBLIC_DOMAIN: domain,
-        NEXT_PUBLIC_REGION: aws.config.requireRegion(),
+        AWS_REGION: aws.config.requireRegion(),
         AUTH_SECRET: authSecret.value,
       },
       permissions: [],

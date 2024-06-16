@@ -1,9 +1,9 @@
 "use client";
 
-import { login } from "@/actions/login";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { LoginModel, loginModel } from "@/models/login";
+import { login } from "@/adapters/web/auth-adapter";
+import { Button } from "@/components/shadcn/button";
+import { Input } from "@/components/shadcn/input";
+import { LoginModel, loginModel } from "@/domain/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -14,7 +14,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "./ui/form";
+} from "@/components/shadcn/form";
 import { useTransition } from "react";
 
 export function LoginForm() {
