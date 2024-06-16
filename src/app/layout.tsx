@@ -32,7 +32,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <header className="container h-14 flex items-center justify-between">
+          <header className="container h-14 flex items-center justify-between mb-8">
             <NavMenu />
             <ThemeToggler />
           </header>

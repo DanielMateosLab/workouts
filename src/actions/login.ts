@@ -1,8 +1,9 @@
 "use server";
-import { signIn } from "@/auth";
 
-export const login = async ({ email }: { email: string }) => {
-  const result = await signIn("email", { email });
-  console.log(result);
-  return result;
+import { signIn } from "@/auth";
+import { loginModel } from "@/models/login";
+
+export const login = async (data: any) => {
+  const { email } = loginModel.parse(data);
+  await signIn("email", { email });
 };

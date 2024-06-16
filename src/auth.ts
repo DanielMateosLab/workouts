@@ -26,6 +26,10 @@ const adapter = DynamoDBAdapter(client, {
 });
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  pages: {
+    verifyRequest: "/auth/link-sent",
+    error: "/auth/error",
+  },
   providers: [
     {
       name: "Email",
@@ -67,8 +71,4 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
   ],
   adapter,
-  // pages: {
-  //   signIn: "/login",
-  // },
-  debug: true,
 });

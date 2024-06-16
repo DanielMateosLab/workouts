@@ -15,8 +15,7 @@ export function NavMenu() {
     <NavigationMenu>
       <NavigationMenuList>
         <MenuLink href="/">Home</MenuLink>
-        <MenuLink href="/login">Login</MenuLink>
-        <MenuLink href="/signup">Signup</MenuLink>
+        <MenuLink href="/auth/login">Login</MenuLink>
       </NavigationMenuList>
     </NavigationMenu>
   );
