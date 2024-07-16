@@ -19,22 +19,3 @@ export const env = createEnv({
 export const envAux = {
   DEFAULT_FROM_EMAIL: `no-reply@${env.NEXT_PUBLIC_DOMAIN}`,
 };
-
-/**
- * Implement this:
- * 
-import { z } from "zod";
- 
-const envVariables = z.object({
-  DATABASE_URL: z.string(),
-  CUSTOM_STUFF: z.string(),
-});
- 
-envVariables.parse(process.env);
- 
-declare global {
-  namespace NodeJS {
-    interface ProcessEnv extends z.infer<typeof envVariables> {}
-  }
-}
- */

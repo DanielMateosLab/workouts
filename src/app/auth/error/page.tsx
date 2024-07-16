@@ -1,21 +1,12 @@
 import { Button } from "@/components/shadcn/button";
 import {
   Card,
+  CardContent,
   CardHeader,
   CardTitle,
-  CardContent,
 } from "@/components/shadcn/card";
-import {
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormMessage,
-} from "@/components/shadcn/form";
-import { Input } from "@/components/shadcn/input";
 import { NextSearchParams } from "@/types/utils";
 import Link from "next/link";
-import { Form } from "react-hook-form";
 
 const errorMap = {
   AccessDenied: "You are not allowed to login.",
