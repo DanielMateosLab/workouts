@@ -1,12 +1,15 @@
 import { DynamoDBAdapter } from "@auth/dynamodb-adapter";
-import { DynamoDB } from "@aws-sdk/client-dynamodb";
+import { DynamoDB, DynamoDBClientConfig } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocument } from "@aws-sdk/lib-dynamodb";
 import { Resource } from "sst";
 import { env } from "@/adapters/env";
 
-const region = env.AWS_REGION;
+const dbConfig: DynamoDBClientConfig = {
+  region: env.AWS_REGION,
+};
+if (env.LOCAL_DEV) dbConfig.endpoint = env.DYNAMODB_ENDPOINT;
 
-const db = new DynamoDB({ region });
+const db = new DynamoDB(dbConfig);
 
 const client = DynamoDBDocument.from(db, {
   marshallOptions: {
